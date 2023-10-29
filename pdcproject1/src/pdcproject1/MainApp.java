@@ -12,6 +12,9 @@ import java.util.Iterator;
 public class MainApp { //Public class
 
     public static void main(String[] args) {
+        Database DB = new Database();
+        DB.createAccountTable("ACCOUNTS");
+        DB.addAccount("Byan", "Crombach", "bryancrombach@gmail.com");
         Scanner scanner = new Scanner(System.in);
         Set<String> enrollments = new HashSet<>();
 
