@@ -4,7 +4,9 @@ package pdcproject1;
  *
  * @author jeromejoseph
  */
+
 //import statements
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -53,6 +55,7 @@ public class CourseSelectionGUI { //Course Selection GUI class
         frame = new JFrame("Course Selection System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
+
         frame.setLayout(new GridLayout(2, 4));
 
         //create and initialize components
