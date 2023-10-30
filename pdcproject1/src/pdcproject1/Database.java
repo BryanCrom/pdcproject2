@@ -17,25 +17,27 @@ public final class Database {
     private Connection conn;
     private static final String CREATE_TABLE_SQL = "CREATE TABLE %s (ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY, FNAME VARCHAR(15), LNAME VARCHAR(15), EMAIL VARCHAR(40)";
     private static final String INSERT_ACCOUNT_SQL = "INSERT INTO ACCOUNTS (FNAME, LNAME, EMAIL) VALUES(?, ?, ?)";
-    private String url;
-    private String usernameDB;
-    private String passwordDB;
+    private static final String GET_ACCOUNT_SQL = "SELECT * FROM ACCOUNTS";
+    private final String URL = "jdbc:derby:UniDB; create=true";
+    private final String DB_USERNAME = "YourUsername";
+    private final String DB_PASSWORD = "YourPassword";
+    private int[] accountID = new int[]{};
+    private int[] accountName = new int[]{};
+    private int[] account = new int[]{};
+    
 
     public Database() {
-        url = "jdbc:derby:UniDB; create=true";
-        usernameDB = "YourUsername";
-        passwordDB = "YourPassword";
         establishConnection();
     }
 
     public void establishConnection() {
         if (conn == null) {
             try {
-                conn = DriverManager.getConnection(url, usernameDB, passwordDB);
-                System.out.println(url + " connection successful");
-            } catch (SQLException e) {
+                conn = DriverManager.getConnection(URL, DB_USERNAME, DB_PASSWORD);
+                System.out.println(URL + " connection successful");
+            } 
+            catch (SQLException e) {
                 System.err.println("Connection error: " + e.getMessage());
-                e.printStackTrace(); // Print the stack trace for detailed error information.
             }
         }
     }
@@ -49,7 +51,6 @@ public final class Database {
             }
         } catch (SQLException e) {
             System.err.println("Failed to create the table: " + e.getMessage());
-            e.printStackTrace(); // Print the stack trace for detailed error information.
         }
     }
 
@@ -62,7 +63,6 @@ public final class Database {
             rsDBMeta.close();
         } catch (SQLException e) {
             System.err.println("Check table error: " + e.getMessage());
-            e.printStackTrace(); // Print the stack trace for detailed error information.
         }
         return tableExists;
     }
@@ -77,7 +77,20 @@ public final class Database {
             System.out.println("Account added successfully.");
         } catch (SQLException e) {
             System.err.println("Add account error: " + e.getMessage());
-            e.printStackTrace(); // Print the stack trace for detailed error information.
+        }
+    }
+    
+    public void getAccounts(){
+        try{
+            Statement statement = conn.createStatement();
+            ResultSet accounts = statement.executeQuery(GET_ACCOUNT_SQL);
+            while(accounts.next())
+            {
+                
+            }
+        }
+        catch(SQLException e){
+            System.err.println("get account error: " + e.getMessage());
         }
     }
 }

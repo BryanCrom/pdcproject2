@@ -15,6 +15,8 @@ public class MainApp { //Public class
         Database DB = new Database();
         DB.createAccountTable("ACCOUNTS");
         DB.addAccount("Byan", "Crombach", "bryancrombach@gmail.com");
+        DB.addAccount("Jerome", "Joseph", "JeromeJoseph@gmail.com");
+        DB.getAccounts();
         Scanner scanner = new Scanner(System.in);
         Set<String> enrollments = new HashSet<>();
 
