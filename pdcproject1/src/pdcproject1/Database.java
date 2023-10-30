@@ -15,16 +15,16 @@ import java.sql.ResultSet;
 public final class Database {
 
     private Connection conn;
-    private static final String CREATE_TABLE_SQL = "CREATE TABLE %s (ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY, FNAME VARCHAR(15), LNAME VARCHAR(15), EMAIL VARCHAR(40)";
+    private static final String CREATE_TABLE_SQL = "CREATE TABLE %s (ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY, FNAME VARCHAR(15), LNAME VARCHAR(15), EMAIL VARCHAR(40))";
     private static final String INSERT_ACCOUNT_SQL = "INSERT INTO ACCOUNTS (FNAME, LNAME, EMAIL) VALUES(?, ?, ?)";
     private static final String GET_ACCOUNT_SQL = "SELECT * FROM ACCOUNTS";
-    private final String URL = "jdbc:derby:UniDB; create=true";
-    private final String DB_USERNAME = "YourUsername";
-    private final String DB_PASSWORD = "YourPassword";
-    private int[] accountID = new int[]{};
-    private int[] accountName = new int[]{};
-    private int[] account = new int[]{};
-    
+    private static final String URL = "jdbc:derby:UniDB; create=true";
+    private static final String DB_USERNAME = "DBUsername";
+    private static final String DB_PASSWORD = "DBPassword";
+    private int[] accountID = new int[20];
+    private String[] accountFName = new String[20];
+    private String[] accountLName = new String[20];
+    private String[] accountEmail = new String[20];
 
     public Database() {
         establishConnection();
@@ -68,29 +68,56 @@ public final class Database {
     }
 
     public void addAccount(String firstName, String lastName, String email) {
-        try {
-            PreparedStatement newAccount = conn.prepareStatement(INSERT_ACCOUNT_SQL);
-            newAccount.setString(1, firstName);
-            newAccount.setString(2, lastName);
-            newAccount.setString(3, email);
-            newAccount.executeUpdate();
-            System.out.println("Account added successfully.");
-        } catch (SQLException e) {
-            System.err.println("Add account error: " + e.getMessage());
+        int count = 0;
+        getAccounts(count);
+        if(!checkEmail(email, count)){
+            try {
+                PreparedStatement newAccount = conn.prepareStatement(INSERT_ACCOUNT_SQL);
+                newAccount.setString(1, firstName);
+                newAccount.setString(2, lastName);
+                newAccount.setString(3, email);
+                newAccount.executeUpdate();
+                System.out.println("Account added successfully.");
+            } catch (SQLException e) {
+                System.err.println("Add account error: " + e.getMessage());
+            }
         }
+        else
+            System.out.println("Another account already uses this email");
     }
     
-    public void getAccounts(){
+    public void getAccounts(int count){
         try{
             Statement statement = conn.createStatement();
             ResultSet accounts = statement.executeQuery(GET_ACCOUNT_SQL);
             while(accounts.next())
             {
-                
+                accountID[count] = accounts.getInt("ID");
+                accountEmail[count] = accounts.getString("EMAIL");
+                accountFName[count] = accounts.getString("FNAME");
+                accountLName[count] = accounts.getString("LNAME");
+                count++;
             }
         }
         catch(SQLException e){
             System.err.println("get account error: " + e.getMessage());
         }
+    }
+    
+    public void printAccount(int index){
+        System.out.println(accountID[index] + ": " + accountFName[index] + " " + accountLName[index] + " " + accountEmail[index]);
+    }
+    
+    public boolean checkEmail(String email, int count){
+        boolean check = false;
+        if(count != 0){
+            for(int i = 0; i <= count; i++){
+                if(accountEmail[i].equalsIgnoreCase(email)){
+                    check = true;
+                    break;
+                }
+            }
+        }
+        return check;
     }
 }
