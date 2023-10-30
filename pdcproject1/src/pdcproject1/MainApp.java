@@ -12,14 +12,34 @@ import java.util.Iterator;
 public class MainApp { //Public class
 
     public static void main(String[] args) {
+        Room lectureRoom = new LectureRoom("WG402", 100, "Epson EB-W06"); 
+        Room labRoom = new LabRoom("WZ504", 30, 40);
+        //Creates lectureRoom and labRoom instances
+        Room lectureRooms = new LectureRoom("WG403", 120, "Epson EB-W06");
+        Room labRooms = new LabRoom("WZ505", 40, 50);
+        
+        //Creates course instances
+        Course course = new Course("ENSE701", "Contemporary Methods in Software Engineering", "This paper explores contemporary software \nengineering issues, methods, and tools, emphasizing \ncollaboration, with a focus on large software-intensive \nsystems.", 15, labRoom, lectureRoom);
+        //Creates course instances
+        Course courses = new Course("COMP716", "Highly Secure Systems", "This paper focuses on advanced network security, \ncovering cryptographic algorithms, authentication, and data \nprotection.", 15, labRooms, lectureRooms);
+        
+        
         Database DB = new Database();
         DB.createAccountTable("ACCOUNTS");
         DB.addAccount("Byan", "Crombach", "bryancrombach@gmail.com");
         DB.addAccount("Jerome", "Joseph", "JeromeJoseph@gmail.com");
         DB.addAccount("Luca", "Edwards", "JeromeJoseph@gmail.com");
-        DB.printAccount(1);
+        DB.addAccount("Luca", "Edwards", "LucaEdwards@gmail.com");
+        DB.printAccount(0);
         DB.printAccount(1);
         DB.printAccount(2);
+        DB.createCourseTables("COURSES", "LAB_ROOMS", "LECTURE_ROOMS");
+        DB.addCourse(course);
+        DB.addCourse(courses);
+        DB.printCourse(0);
+        DB.printCourse(1);
+        DB.printCourse(2);
+        
         Scanner scanner = new Scanner(System.in);
         Set<String> enrollments = new HashSet<>();
 

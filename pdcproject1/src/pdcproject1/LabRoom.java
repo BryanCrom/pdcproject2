@@ -12,6 +12,7 @@ public class LabRoom extends Room { //Public class
         this.numComputers = numComputers;
     }
 
+    @Override
     public int getNumComputers() { //Get method
         return numComputers;
     }
@@ -23,5 +24,10 @@ public class LabRoom extends Room { //Public class
     @Override
     public String displayRoomDetails() {
         return "Room Number: " + getRoomNumber() + "\n" + "Capacity: " + getCapacity() + " people" + "\n" + "Number of Computers: " + numComputers;
+    }
+
+    @Override
+    public String getProjectorModel() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
