@@ -12,6 +12,14 @@ import java.util.Iterator;
 public class MainApp { //Public class
 
     public static void main(String[] args) {
+        Database DB = new Database();
+        DB.createAccountTable("ACCOUNTS");
+        DB.addAccount("Byan", "Crombach", "bryancrombach@gmail.com");
+        DB.addAccount("Jerome", "Joseph", "JeromeJoseph@gmail.com");
+        DB.addAccount("Luca", "Edwards", "JeromeJoseph@gmail.com");
+        DB.printAccount(1);
+        DB.printAccount(1);
+        DB.printAccount(2);
         Scanner scanner = new Scanner(System.in);
         Set<String> enrollments = new HashSet<>();
 
