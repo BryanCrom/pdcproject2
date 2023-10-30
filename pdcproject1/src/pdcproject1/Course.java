@@ -4,7 +4,8 @@ package pdcproject1;
  *
  
 @author Bryan Crombach & Jerome Joseph */
-public class Course { //Public class
+public class Course{ //Public class
+    
     private String courseCode; //Private variable
     private String title; //Private variable
     private String description; //Private variable
@@ -12,7 +13,7 @@ public class Course { //Public class
     private Room lab; //Private variable
     private Room lecture; //Private variable
 
-    public Course(String courseCode, String title, String description, int points, LabRoom lab, LectureRoom lecture) { //Constructor
+    public Course(String courseCode, String title, String description, int points, Room lab, Room lecture) { //Constructor
         this.courseCode = courseCode;
         this.title = title;
         this.description = description;
@@ -22,7 +23,7 @@ public class Course { //Public class
     }
 
     public String getCourseCode() { //Get method
-        return courseCode;
+        return this.courseCode;
     }
 
     public void setCourseCode(String courseCode) { //Set method
@@ -30,7 +31,7 @@ public class Course { //Public class
     }
 
     public String getTitle() { //Get method
-        return title;
+        return this.title;
     }
 
     public void setTitle(String title) { //Set method
@@ -38,7 +39,7 @@ public class Course { //Public class
     }
 
     public String getDescription() { //Get method
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description) { //Set method
@@ -46,11 +47,27 @@ public class Course { //Public class
     }
 
     public int getPoints() { //Get method
-        return points;
+        return this.points;
     }
 
     public void setPoints(int points) { //Set method
         this.points = points;
+    }
+    
+    public Room getLab() { //Get method
+        return this.lab;
+    }
+    
+    public void setlab(Room lab) { //Set method
+        this.lab = lab;
+    }
+    
+    public Room getLecture() { //Get method
+        return this.lecture;
+    }
+    
+    public void setlecture(Room lecture) { //Set method
+        this.lecture = lecture;
     }
 
     @Override

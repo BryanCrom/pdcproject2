@@ -15,17 +15,23 @@ import java.sql.ResultSet;
 public final class Database {
 
     private Connection conn;
-    private static final String CREATE_TABLE_SQL = "CREATE TABLE %s (ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY, FNAME VARCHAR(15), LNAME VARCHAR(15), EMAIL VARCHAR(40))";
     private static final String INSERT_ACCOUNT_SQL = "INSERT INTO ACCOUNTS (FNAME, LNAME, EMAIL) VALUES(?, ?, ?)";
+    private static final String INSERT_COURSE_SQL = "INSERT INTO COURSES (COURSE_CODE, COURSE_NAME, DESCRIPTION, POINTS) VALUES(?, ?, ?, ?)";
+    private static final String INSERT_LAB_ROOM_SQL = "INSERT INTO LAB_ROOMS (ROOM_CODE, COURSE_CODE, CAPACITY, COMPUTER_AMOUNT) VALUES(?, ?, ?, ?)";
+    private static final String INSERT_LECTURE_ROOM_SQL = "INSERT INTO LECTURE_ROOMS (ROOM_CODE, COURSE_CODE, CAPACITY, PROJECTOR_MODEL) VALUES(?, ?, ?, ?)";
     private static final String GET_ACCOUNT_SQL = "SELECT * FROM ACCOUNTS";
+    private static final String GET_COURSE_SQL = "SELECT * FROM COURSES";
     private static final String URL = "jdbc:derby:UniDB; create=true";
     private static final String DB_USERNAME = "DBUsername";
     private static final String DB_PASSWORD = "DBPassword";
-    private int[] accountID = new int[20];
-    private String[] accountFName = new String[20];
-    private String[] accountLName = new String[20];
-    private String[] accountEmail = new String[20];
-
+    private int[] accountIDs = new int[20];
+    private String[] accountLNames = new String[20];
+    private String[] accountFNames = new String[20];
+    private String[] accountEmails = new String[20];
+    private String[] courseCodes = new String[20];
+    private String[] courseNames = new String[20];
+    private String[] descriptions = new String[20];
+    private int[] points = new int[20];
     public Database() {
         establishConnection();
     }
@@ -46,7 +52,7 @@ public final class Database {
         try {
             Statement statement = conn.createStatement();
             if (!checkTableExisting(tableName)) {
-                statement.executeUpdate(CREATE_TABLE_SQL);
+                statement.executeUpdate("CREATE TABLE " + tableName + " (ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY, FNAME VARCHAR(15), LNAME VARCHAR(15), EMAIL VARCHAR(40))");
                 System.out.println("Table " + tableName + " created successfully.");
             }
         } catch (SQLException e) {
@@ -68,9 +74,8 @@ public final class Database {
     }
 
     public void addAccount(String firstName, String lastName, String email) {
-        int count = 0;
-        getAccounts(count);
-        if(!checkEmail(email, count)){
+        getAccounts();
+        if(!checkEmail(email)){
             try {
                 PreparedStatement newAccount = conn.prepareStatement(INSERT_ACCOUNT_SQL);
                 newAccount.setString(1, firstName);
@@ -81,21 +86,21 @@ public final class Database {
             } catch (SQLException e) {
                 System.err.println("Add account error: " + e.getMessage());
             }
-        }
-        else
+        }else
             System.out.println("Another account already uses this email");
     }
     
-    public void getAccounts(int count){
+    public void getAccounts(){
+        int count = 0;
         try{
             Statement statement = conn.createStatement();
             ResultSet accounts = statement.executeQuery(GET_ACCOUNT_SQL);
             while(accounts.next())
             {
-                accountID[count] = accounts.getInt("ID");
-                accountEmail[count] = accounts.getString("EMAIL");
-                accountFName[count] = accounts.getString("FNAME");
-                accountLName[count] = accounts.getString("LNAME");
+                accountIDs[count] = accounts.getInt("ID");
+                accountEmails[count] = accounts.getString("EMAIL");
+                accountFNames[count] = accounts.getString("FNAME");
+                accountLNames[count] = accounts.getString("LNAME");
                 count++;
             }
         }
@@ -105,19 +110,132 @@ public final class Database {
     }
     
     public void printAccount(int index){
-        System.out.println(accountID[index] + ": " + accountFName[index] + " " + accountLName[index] + " " + accountEmail[index]);
+        getAccounts();
+        System.out.println(accountIDs[index] + ": " + accountFNames[index] + " " + accountLNames[index] + " " + accountEmails[index]);
     }
     
-    public boolean checkEmail(String email, int count){
+    public boolean checkEmail(String email){
         boolean check = false;
-        if(count != 0){
-            for(int i = 0; i <= count; i++){
-                if(accountEmail[i].equalsIgnoreCase(email)){
+        try{
+            PreparedStatement findEmail = conn.prepareStatement("SELECT EMAIL FROM ACCOUNTS WHERE EMAIL=?");
+            findEmail.setString(1, email);
+            ResultSet usedEmail = findEmail.executeQuery();
+            while(usedEmail.next()){
+                if(email.equalsIgnoreCase(usedEmail.getString("EMAIL"))){
                     check = true;
-                    break;
                 }
             }
         }
+        catch(SQLException e){
+            System.err.println("check email error: " + e.getMessage());
+        }
         return check;
+    }
+    
+    public void createCourseTables(String tableName1, String tableName2, String tableName3) {
+        try {
+            Statement statement = conn.createStatement();
+            if (!checkTableExisting(tableName1)) {
+                statement.executeUpdate("CREATE TABLE " + tableName1 + " (COURSE_CODE VARCHAR(7) PRIMARY KEY, COURSE_NAME VARCHAR(50), DESCRIPTION VARCHAR(200), POINTS INT)");
+                System.out.println("Table " + tableName1 + " created successfully.");
+            }
+            if (!checkTableExisting(tableName2)) {
+                statement.executeUpdate("CREATE TABLE " + tableName2 + " (ROOM_CODE VARCHAR(5), COURSE_CODE VARCHAR(7),CAPACITY INT, COMPUTER_AMOUNT INT, PRIMARY KEY (ROOM_CODE), FOREIGN KEY (COURSE_CODE) REFERENCES COURSES(COURSE_CODE))");
+                System.out.println("Table " + tableName2 + " created successfully.");
+            }
+            if (!checkTableExisting(tableName3)) {
+                statement.executeUpdate("CREATE TABLE " + tableName3 + " (ROOM_CODE VARCHAR(5), COURSE_CODE VARCHAR(7), CAPACITY INT, PROJECTOR_MODEL VARCHAR(15), PRIMARY KEY (ROOM_CODE), FOREIGN KEY (COURSE_CODE) REFERENCES COURSES(COURSE_CODE))");
+                System.out.println("Table " + tableName3 + " created successfully.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to create the table: " + e.getMessage());
+        }
+    }
+    
+    public void addCourse(Course course) {
+        getCourses();
+        if(!checkCourseCode(course.getCourseCode())){
+            try {
+                PreparedStatement newCourse = conn.prepareStatement(INSERT_COURSE_SQL);
+                newCourse.setString(1, course.getCourseCode());
+                newCourse.setString(2, course.getTitle());
+                newCourse.setString(3, course.getDescription());
+                newCourse.setInt(4, course.getPoints());
+                newCourse.executeUpdate();
+                
+                PreparedStatement newLabRoom = conn.prepareStatement(INSERT_LAB_ROOM_SQL);
+                newLabRoom.setString(1, course.getLab().getRoomNumber());
+                newLabRoom.setString(2, course.getCourseCode());
+                newLabRoom.setInt(3, course.getLab().getCapacity());
+                newLabRoom.setInt(4, course.getLab().getNumComputers());
+                newLabRoom.executeUpdate();
+                
+                PreparedStatement newLectureRoom = conn.prepareStatement(INSERT_LECTURE_ROOM_SQL);
+                newLectureRoom.setString(1, course.getLecture().getRoomNumber());
+                newLectureRoom.setString(2, course.getCourseCode());
+                newLectureRoom.setInt(3, course.getLecture().getCapacity());
+                newLectureRoom.setString(4, course.getLecture().getProjectorModel());
+                newLectureRoom.executeUpdate();
+                
+                System.out.println("Course added successfully.");
+            } catch (SQLException e) {
+                System.err.println("Add course error: " + e.getMessage());
+            }
+        }else
+            System.out.println("Another course already uses this course code");
+    }
+    
+    public void getCourses(){
+        int count = 0;
+        try{
+            Statement statement = conn.createStatement();
+            ResultSet courses = statement.executeQuery(GET_COURSE_SQL);
+            while(courses.next())
+            {
+                courseCodes[count] = courses.getString("COURSE_CODE");
+                courseNames[count] = courses.getString("COURSE_NAME");
+                descriptions[count] = courses.getString("DESCRIPTION");
+                points[count] = courses.getInt("POINTS");
+                count++;
+            }
+        }
+        catch(SQLException e){
+            System.err.println("get courses error: " + e.getMessage());
+        }
+    }
+    
+    public boolean checkCourseCode(String courseCode){
+        boolean check = false;
+        try{
+            PreparedStatement findCourseCode = conn.prepareStatement("SELECT COURSE_CODE FROM COURSES WHERE COURSE_CODE=?");
+            findCourseCode.setString(1, courseCode);
+            ResultSet usedEmail = findCourseCode.executeQuery();
+            while(usedEmail.next()){
+                if(courseCode.equalsIgnoreCase(usedEmail.getString("COURSE_CODE"))){
+                    check = true;
+                }
+            }
+        }
+        catch(SQLException e){
+            System.err.println("check course code error: " + e.getMessage());
+        }
+        return check;
+    }
+    
+    public void printCourse(int index){
+        getCourses();
+        System.out.println(courseCodes[index] + ": " + courseNames[index] + "\n" + descriptions[index] + "\n" + points[index] + "\n");
+    }
+    
+    public void createSelectedTable(String tableName) {
+        try {
+            Statement statement = conn.createStatement();
+            if (!checkTableExisting(tableName)) {
+                statement.executeUpdate("CREATE TABLE " + tableName + " (COURSE_CODE VARCHAR(7) PRIMARY KEY, COURSE_NAME VARCHAR(50), DESCRIPTION VARCHAR(200), POINTS INT)");
+                System.out.println("Table " + tableName + " created successfully.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to create the table: " + e.getMessage());
+        }
     }
 }

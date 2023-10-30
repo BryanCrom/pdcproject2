@@ -31,4 +31,8 @@ public abstract class Room { //Public abstract class
     }
 
     public abstract String displayRoomDetails();
+
+    public abstract int getNumComputers();
+    
+    public abstract String getProjectorModel();
 }
