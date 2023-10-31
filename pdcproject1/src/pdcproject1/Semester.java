@@ -48,4 +48,9 @@ public class Semester { //Public class
     public void setEndDate(String endDate) { //Set method
         this.endDate = endDate;
     }
+    
+    @Override
+    public String toString(){
+        return "\nSemester: " + semesterID + "\nStart date: " + startDate + "\nEnd date: " + endDate;
+    }
 }
