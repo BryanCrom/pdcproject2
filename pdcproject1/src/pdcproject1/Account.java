@@ -9,7 +9,7 @@ package pdcproject1;
  * @author bryan
  */
 public class Account extends Student{
-    
+    //account variables
     private String username;
     private String password;
     private String firstName;
@@ -17,6 +17,7 @@ public class Account extends Student{
     private String email;
     private int studentID;
     
+    //account constructor
     public Account(String username, String password, String firstName, String lastName, String email){
         super(firstName, lastName, email);
         this.username = username;
@@ -24,6 +25,8 @@ public class Account extends Student{
         this.studentID = StudentID.generateRandomStudentID();
     }
 
+    
+    //getters
     public String getUsername() {
         return username;
     }
@@ -51,6 +54,8 @@ public class Account extends Student{
         return studentID;
     }
 
+    
+    //setters
     public void setUsername(String username) {
         this.username = username;
     }

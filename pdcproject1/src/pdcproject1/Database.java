@@ -14,7 +14,9 @@ import java.sql.ResultSet;
 
 public final class Database {
 
-    private Connection conn;
+    private Connection conn; //connection
+    
+    //SQL Queries
     private static final String INSERT_ACCOUNT_SQL = "INSERT INTO ACCOUNTS (STUDENT_ID, UNAME, PWORD, FNAME, LNAME, EMAIL) VALUES(?, ?, ?, ?, ?, ?)";
     private static final String INSERT_COURSE_SQL = "INSERT INTO COURSES (COURSE_CODE, COURSE_NAME, DESCRIPTION, POINTS, SEMESTER) VALUES(?, ?, ?, ?, ?)";
     private static final String INSERT_LAB_ROOM_SQL = "INSERT INTO LAB_ROOMS (ROOM_CODE, COURSE_CODE, CAPACITY, COMPUTER_AMOUNT) VALUES(?, ?, ?, ?)";
@@ -30,6 +32,7 @@ public final class Database {
     private static final String DB_USERNAME = "DBUsername";
     private static final String DB_PASSWORD = "DBPassword";
     
+    //database variables
     private int[] studentIDs = new int[20];
     private String[] accountUNames = new String[20];
     private String[] accountPWords = new String[20];
@@ -67,10 +70,15 @@ public final class Database {
     private int[] accountSelectedPoints = new int[20];
     private int[] accountSelectedSemesters = new int[20];
     
+    //initialise database and create nessecary tables
     public Database() {
         establishConnection();
+        createAccountTable("ACCOUNTS");
+        createCourseTables("COURSES", "LAB_ROOMS", "LECTURE_ROOMS");
+        createSelectedTable("SELECTED_COURSES");
     }
 
+    //establish connection to database
     public void establishConnection() {
         if (conn == null) {
             try {
@@ -83,6 +91,7 @@ public final class Database {
         }
     }
 
+    //create accountsa table method
     public void createAccountTable(String tableName) {
         try {
             Statement statement = conn.createStatement();
@@ -95,6 +104,7 @@ public final class Database {
         }
     }
 
+    //check if table exists
     public boolean checkTableExisting(String newTableName) {
         boolean tableExists = false;
         try {
@@ -108,6 +118,7 @@ public final class Database {
         return tableExists;
     }
 
+    //add account to table
     public void addAccount(Account account) {
         getAccounts();
         if(!checkAccount(account)){
@@ -128,6 +139,7 @@ public final class Database {
             System.out.println("Another account already uses this username or email\n");
     }
     
+    //get accounts into arrays for use
     public void getAccounts(){
         int count = 0;
         try{
@@ -149,9 +161,10 @@ public final class Database {
         }
     }
     
-    public void printAccount(int index){
+    //returns account info as a string
+    public String printAccount(int index){
         getAccounts();
-        System.out.println("USER\nUsername: " + accountUNames[index] + "\nStudent ID: " + studentIDs[index] + "\nName: " + accountFNames[index] + " " + accountLNames[index] + "\nEmail: " + accountEmails[index] + "\n");
+        return "USER\nUsername: " + accountUNames[index] + "\nStudent ID: " + studentIDs[index] + "\nName: " + accountFNames[index] + " " + accountLNames[index] + "\nEmail: " + accountEmails[index] + "\n";
     }
     
     public boolean checkAccount(Account account){
@@ -173,6 +186,7 @@ public final class Database {
         return check;
     }
     
+    //create course table
     public void createCourseTables(String tableName1, String tableName2, String tableName3) {
         try {
             Statement statement = conn.createStatement();
@@ -193,6 +207,7 @@ public final class Database {
         }
     }
     
+    // add course to course table
     public void addCourse(Course course) {
         getCourses();
         if(!checkCourseCode(course.getCourseCode())){
@@ -227,6 +242,7 @@ public final class Database {
             System.out.println("Another course already uses this course code\n");
     }
     
+    //get all course in course table
     public void getCourses(){
         int count = 0;
         try{
@@ -247,6 +263,7 @@ public final class Database {
         }
     }
     
+    //get all labs in lab table
     public void getLabs(){
         int count = 0;
         try{
@@ -264,6 +281,7 @@ public final class Database {
         }
     }
     
+    //get all lectures from lecture table
     public void getLectures(){
         int count = 0;
         try{
@@ -281,6 +299,7 @@ public final class Database {
         }
     }
     
+    //check if course code exists already
     public boolean checkCourseCode(String courseCode){
         boolean check = false;
         try{
@@ -299,29 +318,34 @@ public final class Database {
         return check;
     }
     
-    public void printCourse(int index){
+    // return course info as sring
+    public String printCourse(int index){
         getCourses();
         getLabs();
         getLectures();
         Semester sem = new Semester(semesters[index]);
-        System.out.println(courseCodes[index] + ": " + courseNames[index] + "\n" + descriptions[index] + "\nPoints: " + points[index] + sem.toString() + "\n\nLAB: " + labRoomCodes[index] + "\nCapacity: " + labCapacity[index] + "\nNumber of computers: " + computerAmounts[index] + "\n\nLECTURE: " + lectureRoomCodes[index] + "\nCapacity: " + lectureCapacity[index] + "\nProjector model: " + projectorModels[index] + "\n================================================================");
+        return courseCodes[index] + ": " + courseNames[index] + "\n" + descriptions[index] + "\nPoints: " + points[index] + sem.toString() + "\n\nLAB: " + labRoomCodes[index] + "\nCapacity: " + labCapacity[index] + "\nNumber of computers: " + computerAmounts[index] + "\n\nLECTURE: " + lectureRoomCodes[index] + "\nCapacity: " + lectureCapacity[index] + "\nProjector model: " + projectorModels[index] + "\n================================================================";
     }
     
-    public void printCourses(){
+    // returns all course info on the course table as string
+    public String printCourses(){
+        String str = "";
         try{
             Statement print = conn.createStatement();
             ResultSet courseAmount = print.executeQuery("SELECT COUNT(COURSE_CODE) as numberOfCourses FROM COURSES");
             courseAmount.next();
             int num = courseAmount.getInt("numberOfCourses");
             for(int i = 0; i < num; i++){
-                printCourse(i);
+                str = printCourse(i);
             }
         }
         catch(SQLException e){
             System.err.println("print courses code error: " + e.getMessage());
         }
+        return str;
     }
     
+    //create selected courses table
     public void createSelectedTable(String tableName) {
         try {
             Statement statement = conn.createStatement();
@@ -334,6 +358,7 @@ public final class Database {
         }
     }
     
+    //select course method
     public void selectCourse(Course course, Account account) {
         if(!checkSelectedCourse(account.getStudentID(), course.getCourseCode())){
             try {
@@ -353,6 +378,7 @@ public final class Database {
             System.out.println("User has already selected this course\n");
     }
     
+    //check if a course has already been selected by the user
     public boolean checkSelectedCourse(int id, String courseCode){
         boolean check = false;
         try{
@@ -372,8 +398,10 @@ public final class Database {
         return check;
     }
     
-    public void getSelectedCourses(Account account){
+    // get all selected courses of a certain user
+    public String getSelectedCourses(Account account){
         int count = 0;
+        String str = "";
         try{
             PreparedStatement findSelectedCourses = conn.prepareStatement("SELECT * FROM SELECTED_COURSES WHERE STUDENT_ID=?");
             findSelectedCourses.setInt(1, account.getStudentID());
@@ -389,28 +417,30 @@ public final class Database {
                 count++;
             }
             for(int i = 0; i < count; i++){
-                printSelectedCourse(account, i);
+                str = printSelectedCourse(account, i);
             }
         }
         catch(SQLException e){
             System.err.println("get selected courses error: " + e.getMessage());
         }
+        return str;
     }
     
-    public void printSelectedCourse(Account account, int index){
+    //return selected coureses info as a string
+    public String printSelectedCourse(Account account, int index){
         Semester sem = new Semester(semesters[index]);
-        System.out.println(selectedCourseCodes[index] + ": " + selectedCourseNames[index] + "\n" + selectedDescriptions[index] + "\nPoints: " + selectedPoints[index] + sem.toString() + "\n================================================================");
+        return selectedCourseCodes[index] + ": " + selectedCourseNames[index] + "\n" + selectedDescriptions[index] + "\nPoints: " + selectedPoints[index] + sem.toString() + "\n================================================================";
     }
     
+    //login method checks if the login details exist in the database to allow login
     public boolean login(String username, String password){
         boolean checkAccount = false;
-        Validation.validateUsername(username);
-        Validation.validatePassword(password);
         try{
             PreparedStatement loginInfo = conn.prepareStatement("SELECT UNAME, PWORD FROM ACOUNTS WHERE UNAME=? AND PWORD=?");
             loginInfo.setString(1, username);
             loginInfo.setString(2, password);
             ResultSet login = loginInfo.executeQuery();
+            login.next();
             if(login != null){
                 checkAccount = true;
             }
@@ -419,5 +449,15 @@ public final class Database {
             System.err.println("login error: " + e.getMessage());
         }
         return checkAccount;
+    }
+
+    //close the database
+    public void close() {
+        try{
+            conn.close();
+        }
+        catch(SQLException e){
+            System.err.println("database closing error: " + e.getMessage());
+        }
     }
 }
