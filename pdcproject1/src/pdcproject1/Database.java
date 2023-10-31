@@ -404,6 +404,8 @@ public final class Database {
     
     public boolean login(String username, String password){
         boolean checkAccount = false;
+        Validation.validateUsername(username);
+        Validation.validatePassword(password);
         try{
             PreparedStatement loginInfo = conn.prepareStatement("SELECT UNAME, PWORD FROM ACOUNTS WHERE UNAME=? AND PWORD=?");
             loginInfo.setString(1, username);
