@@ -12,14 +12,16 @@ public class Course{ //Public class
     private int points; //Private variable
     private Room lab; //Private variable
     private Room lecture; //Private variable
+    private int semester;
 
-    public Course(String courseCode, String title, String description, int points, Room lab, Room lecture) { //Constructor
+    public Course(String courseCode, String title, String description, int points, Room lab, Room lecture, int semester) { //Constructor
         this.courseCode = courseCode;
         this.title = title;
         this.description = description;
         this.points = points;
         this.lab = lab;
         this.lecture = lecture;
+        this.semester = semester;
     }
 
     public String getCourseCode() { //Get method
@@ -68,6 +70,14 @@ public class Course{ //Public class
     
     public void setlecture(Room lecture) { //Set method
         this.lecture = lecture;
+    }
+    
+    public int getSemester() { //Get method
+        return this.semester;
+    }
+    
+    public void setSemester(int semester) { //Set method
+        this.semester = semester;
     }
 
     @Override

@@ -8,32 +8,32 @@ package pdcproject1;
  *
  
 @author Bryan Crombach & Jerome Joseph */
-public class Student { //public class
-    private int studentID; //private variable
-    private String name; //private variable
+public abstract class Student { //public class
+    private String firstName; //private variable
+    private String lastName; //private variable
     private String email; //private variable
 
-    public Student(int studentID, String name, String email) { //Constructor
-        this.studentID = studentID;
-        this.name = name;
+    public Student(String firstName, String lastName, String email) { //Constructor
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
     }
 
     // Getter and setter methods for attributes
-    public int getStudentID() { //Get method
-        return studentID;
+    public String getLastName() { //Get method
+        return lastName;
     }
 
-    public void setStudentID(int studentID) { //Set method
-        this.studentID = studentID;
+    public void setLastName(String lastName) { //Set method
+        this.lastName = lastName;
     }
 
-    public String getName() { //Get method
-        return name;
+    public String getFirstName() { //Get method
+        return firstName;
     }
 
-    public void setName(String name) { //Set method
-        this.name = name;
+    public void setFirstName(String firstName) { //Set method
+        this.firstName = firstName;
     }
 
     public String getEmail() { //Get method
